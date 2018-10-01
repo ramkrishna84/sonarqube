@@ -1,0 +1,86 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "sonarqube-app.releasename" . }}
+  labels:
+    app: {{ template "sonarqube-app.releasename" . }}
+    tier: app
+spec:
+  progressDeadlineSeconds: 300
+  replicas: {{ .Values.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ template "sonarqube-app.releasename" . }}
+      tier: app
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ template "sonarqube-app.releasename" . }}
+        tier: app
+      name: {{ template "sonarqube-app.releasename" . }}
+    spec:
+      imagePullSecrets:
+      - name: {{ .Values.image.pullsecret }}
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 2000 /mnt
+        image: sonarqube
+        imagePullPolicy: Always
+        name: sonarqube
+        resources: {}
+        volumeMounts:
+        - name: sonarqube-app
+          mountPath: "/mnt"
+      containers:
+      - name: {{ template "sonarqube-app.releasename" . }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        resources:
+          requests:
+            memory: {{ .Values.memrequest }}
+            cpu: {{ .Values.cpurequest }}
+          limits:
+            memory: {{ .Values.memlimit }}
+            cpu: {{ .Values.cpulimit }}
+        securityContext:
+        runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSecponds: 30
+        volumeMounts: 
+        - name: sonarqube-app
+          mountPath: sonarqube/data
+        - name: config-json
+          mountPath: /opt/config/
+      volumes:
+        - name: config-json
+          configMap: 
+            name: {{ template "sonarqube-app.releasename" . }}
+            items:
+            - key: config.json
+              path: config.json
+  volumeClaimTemplates:
+  - metadata:
+      name: sonarqube-app
+      labels:
+        name: {{ template "sonarqube-app.releasename" . }}
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: anything
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.volumesize }}
+

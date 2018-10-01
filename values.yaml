@@ -1,0 +1,16 @@
+image:
+  repository: "sonarqube"
+  tag: "7.1-alpine"
+  pullPolicy: Always
+#  pullsecret: artifactory.b6nonprod.read.secret
+svc:
+  name: sonarqube
+cpurequest: 2
+cpulimit: 4
+memrequest: 1000Mi
+memlimit: 1000Mi
+volumesize: 10G
+ingress: 
+#  host: sonarqube.it.jetblue.com
+tls:
+  secretName: sonarqube
