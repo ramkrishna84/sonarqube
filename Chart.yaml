@@ -2,5 +2,4 @@ name: sonarqube
 maintainers:
 - email: sai@jetblue.com
   name: Sai K
-version: __VERSION__
-
+version: 0.1.0
