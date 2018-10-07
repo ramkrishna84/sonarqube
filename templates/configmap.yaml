@@ -4,6 +4,6 @@ metadata:
   name: {{ template "sonarqube-app.releasename" . }} 
   labels:
     app: {{ template "sonarqube-app.releasename" . }}
-
-    
-
+data:
+  sonar.properties: |+
+    sonar.web.port=80880

@@ -31,14 +31,14 @@ spec:
       - command:
         - sh
         - -c
-        - chown -R 2000 /opt/sonarqube
+        - chown -R 2000 /mnt
         image: sonarqube
         imagePullPolicy: Always
         name: sonarqube
         resources: {}
         volumeMounts:
         - name: sonarqube-app
-          mountPath: "/opt/sonarqube/"
+          mountPath: "/mnt"
       containers:
       - name: {{ template "sonarqube-app.releasename" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -61,16 +61,16 @@ spec:
         terminationGracePeriodSecponds: 30
         volumeMounts: 
         - name: sonarqube-app
-          mountPath: /opt/sonarqube/data 
+          mountPath: sonarqube/data
         - name: config-json
-          mountPath: /opt/sonarqube/config
+          mountPath: /opt/config/
       volumes:
         - name: config-json
           configMap: 
             name: {{ template "sonarqube-app.releasename" . }}
             items:
-            - key: sonar.properties
-              path: sonar.properties
+            - key: config.json
+              path: config.json
   volumeClaimTemplates:
   - metadata:
       name: sonarqube-app

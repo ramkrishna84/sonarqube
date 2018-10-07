@@ -5,8 +5,8 @@ image:
 #  pullsecret: artifactory.b6nonprod.read.secret
 svc:
   name: sonarqube
-cpurequest: 2
-cpulimit: 4
+cpurequest: 1 
+cpulimit: 1 
 memrequest: 1000Mi
 memlimit: 1000Mi
 volumesize: 10G
